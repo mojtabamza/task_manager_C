@@ -4,24 +4,6 @@
 #include "systick.h"
 
 
-
-struct flags_t
-{
-	uint8_t flag_a : 1;
-	uint8_t flag_b : 1;
-	uint8_t flag_c : 1;
-}flags;
-
-void flag_handler_a(void) {
-	flags.flag_a = 1;
-}
-void flag_handler_b(void) {
-	flags.flag_b = 1;
-}
-void flag_handler_c(void) {
-	flags.flag_c = 1;
-}
-
 void task_A() {
 	printf("TASK A!\r\n");
 }
@@ -31,27 +13,37 @@ void task_B() {
 void task_C() {
 	printf("TASK C!\r\n");
 }
+void task_D() {
+	printf("TASK D!\r\n");
+}
 
 
 int main() {
 
-	add_tasks(flag_handler_a, 10);
-	add_tasks(flag_handler_b, 15);
-	add_tasks(flag_handler_c, 20);
+	add_tasks("TASK_0", 10); //set flag[0] for being true every 10 tick
+	add_tasks("TASK_1", 15);
+	add_tasks("TASK_2", 20);
+	add_tasks("TASK_3", 4);
+
+	systick_init();
 
 	while (1) {
 		systick_handler();
-		if (flags.flag_a) {
-			flags.flag_a = 0;
+		if (task_exe_flag[0]) { //0 the flag of task_0 ==> task_A will execute every 10 tick
+			task_exe_flag[0] = 0;
 			task_A();
 		}
-		if (flags.flag_b) {
-			flags.flag_b = 0;
+		if (task_exe_flag[1]) {
+			task_exe_flag[1] = 0;
 			task_B();
 		}
-		if (flags.flag_c) {
-			flags.flag_c = 0;
+		if (task_exe_flag[2]) {
+			task_exe_flag[2] = 0;
 			task_C();
+		}
+		if (task_exe_flag[3]) {
+			task_exe_flag[3] = 0;
+			task_D();
 		}
 
 	}
