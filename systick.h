@@ -31,13 +31,15 @@ void add_tasks(void(*task)(void), int interval) {
 }
 
 void systick_isr() {
-	//int task_vec_size = sizeof(task_vec) / sizeof(task_vec[0]);
+	int task_vec_size = sizeof(task_vec) / sizeof(task_vec[0]);
 	systick_obj.tick_counter++;
 	printf("tick_counter :%d\r\n", systick_obj.tick_counter);
-	for (int i = 0; i < 3; i++) {
-		if (task_vec[i].task_obj.exe_time == systick_obj.tick_counter) {
-			task_vec[i].task_obj.task();
-			task_vec[i].task_obj.exe_time = systick_obj.tick_counter + task_vec[i].task_obj.interval;
+	for (int i = 0; i < task_vec_size; i++) {
+		if (task_vec[i].task_obj.interval > 0) {
+			if (task_vec[i].task_obj.exe_time == systick_obj.tick_counter) {
+				task_vec[i].task_obj.task();
+				task_vec[i].task_obj.exe_time = systick_obj.tick_counter + task_vec[i].task_obj.interval;
+			}
 		}
 	}
 }
